@@ -298,7 +298,7 @@ B.Tech Computer Science & Engineering
 
 🔗 GitHub: https://github.com/Farhan-07-00
 
-🔗 LinkedIn: YOUR_LINKEDIN_LINK
+🔗 LinkedIn: https://www.linkedin.com/in/farhan-akthar-167a31324/
 
 ---
 
