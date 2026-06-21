@@ -10,7 +10,7 @@
 
 ### Real-Time Weather • AQI Monitoring • Smart Insights • Interactive Maps
 
-🌐 **Live Demo:** [WeatherIQ](YOUR_NETLIFY_LINK)
+🌐 **Live Demo:** [WeatherIQ](https://weathermaxxx.netlify.app/)
 
 </div>
 
