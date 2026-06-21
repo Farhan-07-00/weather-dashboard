@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weather Dashboard — OpenWeather + Leaflet (Day/Night)</title>
+  <meta name="description"
+  
+    content="Single-file weather dashboard using free OpenWeather APIs, Leaflet map layers, and Chart.js. Search cities, geolocate, switch weather layers, and view current, hourly, and 5-day forecasts. Includes Day/Night theme toggle." />
+
+  <link rel="stylesheet" href="style.css" />
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+  <video id="bgVideo" autoplay muted loop playsinline>
+  <source src="videos/sunny.mp4" type="video/mp4">
+  </video>
+<div class="video-overlay"></div>
+  
+    <div id="weatherEffects"></div>
+  <header>
+    <div class="wrap bar">
+      <div class="brand">
+        <span class="logo">⛅</span> <span>Weather Dashboard</span>
+      </div>
+      
+ <input id="q" type="text" placeholder="Search city…" />
+ <button id="btnSearch" class="btn">Search</button>
+ <button id="btnVoice" class="btn">🎤 Voice Search</button>
+ <button id="btnLocate" class="btn primary">Use my location</button>
+
+ <div class="top-actions">
+
+  <button id="saveCity" class="btn">
+    ❤️ Save
+  </button>
+
+  <button id="btnTheme" class="btn toggle">
+    🌙 Night
+  </button>
+
+   </div>
+</div>
+
+  <main>
+    <div id="welcomeScreen">
+  <h1>🌤️ Welcome to Weather Dashboard</h1>
+
+  <p>
+    Real-time Weather • AQI • Forecast • Maps • Insights
+  </p>
+
+  <button id="welcomeLocation" class="btn primary">
+    📍 Use My Location
+  </button>
+
+  <div style="margin:20px 0;">OR</div>
+
+ <button id="focusSearch" class="btn">
+  🔍 Search a City
+ </button>
+  </div>
+
+    
+    <!-- Left: Map and layer controls -->
+    <section class="card">
+      <div class="section">
+        <h3>Map & Layers</h3>
+        <div class="row" style="justify-content: space-between">
+          <div class="row">
+            <label>Layer:</label>
+            <select id="layerSelect" class="select">
+              <option value="">None (base map)</option>
+              <option value="temp_new">Temperature</option>
+              <option value="precipitation_new">Precipitation</option>
+              <option value="clouds_new">Clouds</option>
+              <option value="wind_new">Wind</option>
+              <option value="pressure_new">Pressure</option>
+            </select>
+            <label>Opacity</label>
+            <input id="layerOpacity" type="range" class="range" min="0" max="1" step="0.05" value="0.7" />
+          </div>
+          <div class="row">
+            <label>Units</label>
+            <select id="units" class="select">
+              <option value="metric">Metric (°C, m/s)</option>
+              <option value="imperial">Imperial (°F, mph)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="map"></div>
+      <div class="card">
+  <div class="section">
+    <h3>🌅 Sun Journey</h3>
+
+    <div class="sun-track">
+      <div id="sunDot"></div>
+    </div>
+
+    <div class="sun-times">
+      <span>
+        🌄 Sunrise:
+        <span id="sunriseText">--:--</span>
+      </span>
+
+      <span>
+        🌇 Sunset:
+        <span id="sunsetText">--:--</span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section apple-hero">
+
+    <div id="heroIcon" class="apple-icon">☀️</div>
+
+    <div id="heroTemp" class="apple-temp">32°</div>
+
+    <div id="heroCity" class="apple-city">
+      Mumbai, IN
+    </div>
+
+    <div id="heroFeels" class="apple-feels">
+      Feels like 35°
+    </div>
+
+    <div id="heroDesc" class="apple-desc">
+      Partly Cloudy
+    </div>
+
+  </div>
+</div>
+<div class="card">
+  <div class="section">
+    <h3>🎯 Activity Suitability</h3>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="k">🏃 Running</div>
+        <div class="v" id="runScore">--/10</div>
+      </div>
+
+      <div class="stat">
+        <div class="k">🚴 Cycling</div>
+        <div class="v" id="cycleScore">--/10</div>
+      </div>
+
+      <div class="stat">
+        <div class="k">🌳 Outdoor</div>
+        <div class="v" id="outdoorScore">--/10</div>
+      </div>
+
+      <div class="stat">
+        <div class="k">📸 Photography</div>
+        <div class="v" id="photoScore">--/10</div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+<div class="card">
+  <div class="section">
+    <h3>🌍 Weather Facts</h3>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="k">🌡 Highest Today</div>
+        <div class="v" id="maxTemp">--°</div>
+      </div>
+
+      <div class="stat">
+        <div class="k">❄ Lowest Today</div>
+        <div class="v" id="minTemp">--°</div>
+      </div>
+
+      <div class="stat">
+        <div class="k">💧 Humidity</div>
+        <div class="v" id="factHumidity">--%</div>
+      </div>
+
+      <div class="stat">
+        <div class="k">🌬 Wind Speed</div>
+        <div class="v" id="factWind">-- km/h</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="section">
+    <h3>👕 Clothing Recommendation</h3>
+
+    <div id="clothingTips">
+      Loading...
+    </div>
+  </div>
+</div>
+    </section>
+    
+    
+
+    <!-- Right: Current + details -->
+    <section class="grid">
+        <div class="card">
+  <div class="section">
+    <h3>❤️ Favorite Cities</h3>
+    <div id="favorites"></div>
+  </div>
+</div>
+      <div class="card">
+        <div class="section current">
+          <div style="font-size: 32px" id="wIcon">☁️</div>
+          <div>
+            <div class="city" id="city">—</div>
+            <div class="desc" id="desc">
+              Search a city or use your location.
+            </div>
+          </div>
+          <div id="temp" class="hero-temp">--°</div>
+        </div>
+        <div class="section stats">
+          <div class="stat">
+            <div class="k">Feels like</div>
+            <div class="v" id="feels">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Humidity</div>
+            <div class="v" id="hum">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Wind</div>
+            <div class="v" id="wind">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Pressure</div>
+            <div class="v" id="press">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Visibility</div>
+            <div class="v" id="vis">—</div>
+          </div>
+          <div class="stat">
+            <div class="k">Local Time</div>
+            <div class="v" id="localTime">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section">
+          <h3>Air Quality</h3>
+          <div class="row" style="justify-content: space-between; align-items: center">
+            <div id="aqiBadge" class="btn" style="font-weight: 700">
+              AQI —
+            </div>
+            <div class="note">1=Good · 5=Very Poor</div>
+          </div>
+          <div class="stats" style="margin-top: 10px">
+            <div class="stat">
+              <div class="k">PM2.5</div>
+              <div class="v" id="pm25">—</div>
+            </div>
+            <div class="stat">
+              <div class="k">PM10</div>
+              <div class="v" id="pm10">—</div>
+            </div>
+            <div class="stat">
+              <div class="k">NO₂</div>
+              <div class="v" id="no2">—</div>
+            </div>
+            <div class="stat">
+              <div class="k">O₃</div>
+              <div class="v" id="o3">—</div>
+            </div>
+            <div class="stat">
+              <div class="k">SO₂</div>
+              <div class="v" id="so2">—</div>
+            </div>
+            <div class="stat">
+              <div class="k">CO</div>
+              <div class="v" id="co">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <!-- Smart Weather Insights -->
+    <!-- Smart Weather Insights -->
+<div class="card">
+  <div class="section">
+    <h3>🧠 AI Weather Analysis</h3>
+    <div id="recommendation"></div>
+    
+    </div>
+  </div>
+</div>
+
+<!-- Weather Suggestions -->
+<div class="card">
+  <div class="section">
+    <h3>💡 Action Recommendations</h3>
+    <div id="weatherTips"></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section">
+    <h3>Hourly (next 24h)</h3>
+      
+
+      <div class="card">
+        <div class="section">
+          <h3>Hourly (next 24h)</h3>
+          <canvas id="hourlyChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section">
+          <h3>5-Day Forecast</h3>
+          <div id="forecast" class="forecast"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+  <script src="config.js"></script>
+  <script defer src="script.js"></script>
+</body>
+
+
+</html>
+
+
